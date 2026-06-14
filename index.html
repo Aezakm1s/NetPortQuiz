@@ -1,0 +1,2484 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								.btn-reveal {
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+/* Only shown when JS adds .revealed to the parent button */
+.answer-btn.revealed .btn-reveal { opacity: 1; transform: translateX(0); }
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NetPort Quiz — Master Network Ports</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050a0f;
+    --bg2: #0a1520;
+    --bg3: #0f2030;
+    --neon-green: #00ff88;
+    --neon-cyan: #00d4ff;
+    --neon-purple: #bf00ff;
+    --neon-pink: #ff0080;
+    --neon-yellow: #ffff00;
+    --neon-orange: #ff6600;
+    --text: #c8e6f0;
+    --text-dim: #5a8a9f;
+    --correct: #00ff88;
+    --wrong: #ff3366;
+    --border: #1a3a4a;
+    --card-bg: #0a1a2a;
+    --glow-green: 0 0 20px #00ff8866, 0 0 40px #00ff8833;
+    --glow-cyan: 0 0 20px #00d4ff66, 0 0 40px #00d4ff33;
+    --glow-purple: 0 0 20px #bf00ff66;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridScroll 20s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(0,212,255,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 50%, rgba(0,255,136,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes gridScroll {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(50px); }
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .screen { display: none; animation: fadeIn 0.5s ease; }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===================== START SCREEN ===================== */
+  .start-screen { text-align: center; padding: 40px 20px; }
+  .logo-area { margin-bottom: 30px; }
+
+  .logo-icon {
+    font-size: 64px;
+    display: block;
+    margin-bottom: 10px;
+    animation: logoPulse 2s infinite;
+  }
+
+  @keyframes logoPulse {
+    0%,100% { transform: scale(1);    filter: drop-shadow(0 0 10px #00d4ff); }
+    50%      { transform: scale(1.05); filter: drop-shadow(0 0 20px #00ff88); }
+  }
+
+  .logo-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 42px; font-weight: 900;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+
+  .logo-sub {
+    font-size: 16px;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 4px;
+  }
+
+  /* ── Persistent Stats Banner ── */
+  .persistent-banner {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .persistent-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan), var(--neon-green));
+  }
+
+  .pb-left { display: flex; align-items: center; gap: 14px; }
+
+  .pb-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0;
+    box-shadow: 0 0 14px rgba(191,0,255,0.4);
+  }
+
+  .pb-level {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px; font-weight: 700;
+    color: var(--neon-purple); letter-spacing: 2px;
+  }
+
+  .pb-xp {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px; color: var(--text-dim); margin-top: 2px;
+  }
+
+  .pb-xp-bar-bg {
+    width: 140px; height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px; overflow: hidden; margin-top: 5px;
+  }
+
+  .pb-xp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan));
+    border-radius: 3px;
+    transition: width 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+
+  .pb-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+  .pb-stat  { text-align: center; }
+
+  .pb-stat-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px; font-weight: 700; display: block;
+  }
+  .pb-stat-val.cyan   { color: var(--neon-cyan); }
+  .pb-stat-val.green  { color: var(--neon-green); }
+  .pb-stat-val.gold   { color: #ffd700; }
+  .pb-stat-val.orange { color: var(--neon-orange); }
+
+  .pb-stat-lbl {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; color: var(--text-dim);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  .pb-reset-btn {
+    background: transparent;
+    border: 1px solid rgba(255,51,102,0.35);
+    border-radius: 6px; padding: 5px 12px;
+    color: rgba(255,51,102,0.65);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; cursor: pointer;
+    transition: all 0.3s; letter-spacing: 1px;
+    align-self: flex-start;
+  }
+
+  .pb-reset-btn:hover {
+    border-color: var(--wrong); color: var(--wrong);
+    box-shadow: 0 0 8px rgba(255,51,102,0.3);
+  }
+
+  /* Save indicator */
+  .save-indicator {
+    position: fixed; bottom: 16px; right: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--neon-green);
+    border-radius: 8px; padding: 8px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px; color: var(--neon-green);
+    display: flex; align-items: center; gap: 6px;
+    z-index: 2000;
+    opacity: 0; transform: translateY(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+
+  .save-indicator.show { opacity: 1; transform: translateY(0); }
+
+  .save-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--neon-green);
+    animation: savePulse 1s infinite;
+  }
+
+  @keyframes savePulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+  }
+
+  .scan-line {
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+    margin: 24px 0; position: relative; overflow: hidden;
+  }
+
+  .scan-line::after {
+    content: '';
+    position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, #fff, transparent);
+    animation: scan 3s infinite;
+  }
+
+  @keyframes scan { 0% { left: -100%; } 100% { left: 100%; } }
+
+  .section-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px; color: var(--neon-cyan);
+    letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase;
+  }
+
+  .difficulty-cards {
+    display: flex; gap: 16px;
+    justify-content: center; flex-wrap: wrap; margin-bottom: 34px;
+  }
+
+  .diff-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px; padding: 24px 20px;
+    cursor: pointer; transition: all 0.3s ease;
+    flex: 1; min-width: 200px; max-width: 240px;
+    position: relative; overflow: hidden; text-align: center;
+  }
+
+  .diff-card::before {
+    content: '';
+    position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transition: left 0.4s;
+  }
+
+  .diff-card:hover::before { left: 100%; }
+
+  .diff-card.selected {
+    border-color: var(--neon-cyan);
+    box-shadow: var(--glow-cyan);
+    background: rgba(0,212,255,0.08);
+  }
+
+  .diff-card:hover {
+    border-color: var(--neon-cyan);
+    transform: translateY(-4px);
+    box-shadow: var(--glow-cyan);
+  }
+
+  .diff-card .diff-icon  { font-size: 36px; margin-bottom: 10px; }
+  .diff-card .diff-name  {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px; font-weight: 700;
+    letter-spacing: 2px; margin-bottom: 8px;
+  }
+
+  .diff-card.easy   .diff-name { color: var(--neon-green); }
+  .diff-card.medium .diff-name { color: var(--neon-yellow); }
+  .diff-card.hard   .diff-name { color: var(--neon-pink); }
+
+  .diff-card .diff-desc  { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+  .diff-card .diff-ports { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text-dim); margin-top: 8px; }
+  .diff-best { margin-top: 10px; font-family: 'Share Tech Mono', monospace; font-size: 10px; color: #ffd700; letter-spacing: 1px; min-height: 16px; }
+
+  .q-count-selector {
+    display: flex; gap: 10px;
+    justify-content: center; margin-bottom: 34px; flex-wrap: wrap;
+  }
+
+  .q-count-btn {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 8px; padding: 10px 24px;
+    color: var(--text);
+    font-family: 'Orbitron', monospace; font-size: 14px;
+    cursor: pointer; transition: all 0.3s;
+  }
+
+  .q-count-btn:hover,
+  .q-count-btn.selected {
+    border-color: var(--neon-green); color: var(--neon-green);
+    box-shadow: var(--glow-green); background: rgba(0,255,136,0.08);
+  }
+
+  .start-btn {
+    background: linear-gradient(135deg, rgba(0,255,136,0.15), rgba(0,212,255,0.15));
+    border: 2px solid var(--neon-cyan);
+    border-radius: 12px; padding: 18px 60px;
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700;
+    letter-spacing: 3px; cursor: pointer; transition: all 0.3s ease;
+    position: relative; overflow: hidden;
+  }
+
+  .start-btn::before {
+    content: '';
+    position: absolute; top: 50%; left: 50%;
+    width: 0; height: 0;
+    background: rgba(0,212,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%,-50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .start-btn:hover::before { width: 400px; height: 400px; }
+  .start-btn:hover { box-shadow: var(--glow-cyan); transform: translateY(-2px); color: #fff; }
+
+  /* ===================== GAME SCREEN ===================== */
+  .game-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px; gap: 12px; flex-wrap: wrap;
+  }
+
+  .score-block {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 18px;
+    display: flex; flex-direction: column; align-items: center;
+    min-width: 90px;
+  }
+
+  .score-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; color: var(--text-dim);
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+
+  .score-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px; font-weight: 700;
+    color: var(--neon-cyan); transition: all 0.3s;
+  }
+
+  .score-value.bump { animation: scoreBump 0.4s ease; }
+
+  @keyframes scoreBump {
+    0%  { transform: scale(1); }
+    50% { transform: scale(1.4); color: var(--neon-green); }
+    100%{ transform: scale(1); }
+  }
+
+  .streak-block {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 18px;
+    display: flex; flex-direction: column; align-items: center;
+    min-width: 80px; transition: all 0.3s;
+  }
+
+  .streak-block.hot {
+    border-color: var(--neon-orange);
+    box-shadow: 0 0 15px rgba(255,102,0,0.4);
+    animation: streakPulse 1s infinite;
+  }
+
+  @keyframes streakPulse {
+    0%,100% { box-shadow: 0 0 15px rgba(255,102,0,0.4); }
+    50%      { box-shadow: 0 0 25px rgba(255,102,0,0.7); }
+  }
+
+  .streak-display {
+    font-size: 24px; line-height: 1;
+    font-family: 'Orbitron', monospace; color: var(--neon-orange);
+  }
+
+  .xp-area {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 16px;
+    flex: 1; min-width: 180px;
+  }
+
+  .xp-header {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 6px;
+  }
+
+  .level-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px; color: var(--neon-purple); letter-spacing: 2px;
+  }
+
+  .xp-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; color: var(--text-dim);
+  }
+
+  .xp-bar-bg {
+    width: 100%; height: 8px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px; overflow: hidden;
+  }
+
+  .xp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan));
+    border-radius: 4px;
+    transition: width 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
+    position: relative; overflow: hidden;
+  }
+
+  .xp-bar-fill::after {
+    content: '';
+    position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: xpShine 2s infinite;
+  }
+
+  @keyframes xpShine { 0% { left: -100%; } 100% { left: 100%; } }
+
+  .progress-area { margin-bottom: 20px; }
+
+  .progress-header {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 8px;
+  }
+
+  .progress-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px; color: var(--text-dim);
+  }
+
+  .difficulty-badge {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px; padding: 3px 10px;
+    border-radius: 20px; letter-spacing: 2px;
+  }
+
+  .difficulty-badge.easy   { border: 1px solid var(--neon-green);  color: var(--neon-green); }
+  .difficulty-badge.medium { border: 1px solid var(--neon-yellow); color: var(--neon-yellow); }
+  .difficulty-badge.hard   { border: 1px solid var(--neon-pink);   color: var(--neon-pink); }
+
+  .progress-bar-bg {
+    width: 100%; height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px; overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+    border-radius: 3px; transition: width 0.5s ease;
+  }
+
+  .question-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 30px; margin-bottom: 20px;
+    position: relative; overflow: hidden;
+    animation: slideDown 0.4s ease;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .question-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green), var(--neon-purple));
+  }
+
+  .q-category {
+    display: flex; align-items: center;
+    gap: 8px; margin-bottom: 16px;
+  }
+
+  .q-cat-icon { font-size: 20px; }
+
+  .q-cat-name {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px; color: var(--text-dim);
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+
+  .q-type-badge {
+    margin-left: auto;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--neon-cyan); color: var(--neon-cyan);
+  }
+
+  .question-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px; font-weight: 600;
+    color: var(--text); margin-bottom: 8px; line-height: 1.4;
+  }
+
+  .port-number-big {
+    font-family: 'Orbitron', monospace;
+    font-size: 52px; font-weight: 900;
+    color: var(--neon-cyan); text-shadow: var(--glow-cyan);
+    display: block; margin: 10px 0; letter-spacing: 4px;
+  }
+
+  .service-name-big {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 36px; color: var(--neon-green);
+    text-shadow: var(--glow-green);
+    display: block; margin: 10px 0;
+  }
+
+  /* ── Answer buttons ── */
+  .answers-grid {
+    display: flex; flex-direction: column;
+    gap: 12px; margin-bottom: 20px;
+  }
+
+  .answer-btn {
+    background: rgba(10,26,42,0.8);
+    border: 2px solid var(--border);
+    border-radius: 12px; padding: 16px 22px;
+    cursor: pointer; transition: all 0.25s ease;
+    display: flex; align-items: center; gap: 14px;
+    text-align: left; position: relative; overflow: hidden;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 17px; font-weight: 600; color: var(--text);
+    width: 100%;
+  }
+
+  .answer-btn::before {
+    content: '';
+    position: absolute; top: 50%; left: 0;
+    width: 4px; height: 0;
+    background: var(--neon-cyan);
+    transform: translateY(-50%);
+    transition: height 0.25s ease;
+    border-radius: 0 2px 2px 0;
+  }
+
+  .answer-btn:hover:not(:disabled) {
+    border-color: var(--neon-cyan);
+    background: rgba(0,212,255,0.08);
+    transform: translateX(4px);
+    box-shadow: var(--glow-cyan);
+  }
+
+  .answer-btn:hover:not(:disabled)::before { height: 60%; }
+  .answer-btn:active:not(:disabled) { transform: scale(0.98) translateX(2px); }
+
+  .btn-letter {
+    width: 30px; height: 30px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px; font-weight: 700;
+    flex-shrink: 0; transition: all 0.25s;
+  }
+
+  .answer-btn:hover:not(:disabled) .btn-letter {
+    border-color: var(--neon-cyan); color: var(--neon-cyan);
+  }
+
+  /* The reveal tag shown after answering */
+  .btn-reveal {
+    margin-left: auto;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    /* hidden until revealed */
+    opacity: 0;
+    transform: translateX(6px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+  }
+
+  /* Class toggled by JS to show the reveal tag */
+  .answer-btn.revealed .btn-reveal {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Override reveal tag colours after result is known */
+  .answer-btn.correct .btn-reveal {
+    color: var(--neon-green);
+    border-color: rgba(0,255,136,0.4);
+    background: rgba(0,255,136,0.1);
+  }
+
+  .answer-btn.wrong .btn-reveal {
+    color: var(--wrong);
+    border-color: rgba(255,51,102,0.4);
+    background: rgba(255,51,102,0.1);
+  }
+
+  /* Dim reveal tag on the neutral (neither correct nor wrong) button after answering */
+  .answer-btn.neutral-after .btn-reveal {
+    opacity: 0.45;
+  }
+
+  .answer-btn.correct {
+    border-color: var(--neon-green) !important;
+    background: rgba(0,255,136,0.12) !important;
+    box-shadow: var(--glow-green) !important;
+    animation: correctPop 0.5s ease;
+  }
+
+  .answer-btn.correct .btn-letter {
+    border-color: var(--neon-green); color: var(--neon-green);
+    background: rgba(0,255,136,0.2);
+  }
+
+  .answer-btn.wrong {
+    border-color: var(--wrong) !important;
+    background: rgba(255,51,102,0.12) !important;
+    box-shadow: 0 0 20px rgba(255,51,102,0.4) !important;
+    animation: wrongShake 0.4s ease;
+  }
+
+  .answer-btn.wrong .btn-letter {
+    border-color: var(--wrong); color: var(--wrong);
+    background: rgba(255,51,102,0.2);
+  }
+
+  @keyframes correctPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.03); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes wrongShake {
+    0%,100% { transform: translateX(0); }
+    20%     { transform: translateX(-6px); }
+    40%     { transform: translateX(6px); }
+    60%     { transform: translateX(-4px); }
+    80%     { transform: translateX(4px); }
+  }
+
+  .answer-btn:disabled { cursor: not-allowed; }
+
+  /* ── Explanation card ── */
+  .explanation-card {
+    background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(0,255,136,0.05));
+    border: 1px solid rgba(0,212,255,0.3);
+    border-radius: 14px; padding: 22px; margin-bottom: 20px;
+    display: none; animation: slideUp 0.4s ease;
+  }
+
+  .explanation-card.show { display: block; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .exp-header {
+    display: flex; align-items: center;
+    gap: 10px; margin-bottom: 14px;
+  }
+
+  .exp-result-icon  { font-size: 24px; }
+
+  .exp-result-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px; font-weight: 700; letter-spacing: 2px;
+  }
+
+  .exp-result-text.correct-text { color: var(--neon-green); }
+  .exp-result-text.wrong-text   { color: var(--wrong); }
+
+  .exp-correct-answer {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px; color: var(--neon-cyan); margin-left: auto;
+  }
+
+  .exp-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px; margin-top: 12px;
+  }
+
+  @media (max-width: 640px) { .exp-grid { grid-template-columns: 1fr; } }
+
+  .exp-section {
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px; padding: 12px;
+    border-left: 3px solid var(--neon-cyan);
+  }
+
+  .exp-section:nth-child(2) { border-left-color: var(--neon-green); }
+  .exp-section:nth-child(3) { border-left-color: var(--neon-purple); }
+
+  .exp-section-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 2px;
+    color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase;
+  }
+
+  .exp-section-content { font-size: 13px; line-height: 1.5; color: var(--text); }
+
+  .memory-tip {
+    background: rgba(191,0,255,0.1);
+    border: 1px solid rgba(191,0,255,0.3);
+    border-radius: 8px; padding: 10px 14px;
+    margin-top: 12px; font-size: 13px; color: var(--text);
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+
+  .tip-icon { font-size: 16px; flex-shrink: 0; }
+
+  /* ── Next button ── */
+  .next-btn {
+    width: 100%;
+    background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(0,255,136,0.1));
+    border: 2px solid var(--neon-cyan);
+    border-radius: 12px; padding: 16px;
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', monospace;
+    font-size: 15px; font-weight: 700; letter-spacing: 3px;
+    cursor: pointer; transition: all 0.3s ease;
+    display: none; animation: fadeIn 0.4s ease;
+    position: relative; overflow: hidden;
+  }
+
+  .next-btn.show { display: block; }
+
+  .next-btn::after {
+    content: '';
+    position: absolute; top: 50%; right: 20px;
+    width: 8px; height: 8px;
+    border-top: 2px solid var(--neon-cyan);
+    border-right: 2px solid var(--neon-cyan);
+    transform: translateY(-50%) rotate(45deg);
+    transition: right 0.3s;
+  }
+
+  .next-btn:hover { background: rgba(0,212,255,0.15); box-shadow: var(--glow-cyan); transform: translateY(-2px); }
+  .next-btn:hover::after { right: 14px; }
+
+  /* ===================== CHECKPOINT / RESULTS ===================== */
+  .results-screen { text-align: center; padding: 20px; }
+
+  .results-trophy {
+    font-size: 72px; animation: trophyBounce 1s ease;
+    display: block; margin-bottom: 10px;
+  }
+
+  @keyframes trophyBounce {
+    0%   { transform: scale(0) rotate(-20deg); }
+    60%  { transform: scale(1.2) rotate(5deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  .results-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 28px; font-weight: 900;
+    background: linear-gradient(135deg, var(--neon-yellow), var(--neon-orange));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; letter-spacing: 2px; margin-bottom: 8px;
+  }
+
+  .results-subtitle {
+    font-size: 15px; color: var(--text-dim); margin-bottom: 30px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .stats-row {
+    display: flex; gap: 12px;
+    justify-content: center; flex-wrap: wrap; margin-bottom: 30px;
+  }
+
+  .stat-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 24px;
+    min-width: 110px; flex: 1; max-width: 150px;
+  }
+
+  .stat-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 28px; font-weight: 700;
+    display: block; margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; color: var(--text-dim);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  .stat-box.green  .stat-value { color: var(--neon-green); }
+  .stat-box.red    .stat-value { color: var(--wrong); }
+  .stat-box.cyan   .stat-value { color: var(--neon-cyan); }
+  .stat-box.purple .stat-value { color: var(--neon-purple); }
+
+  .weak-ports-section {
+    background: var(--card-bg);
+    border: 1px solid rgba(255,51,102,0.3);
+    border-radius: 14px; padding: 20px;
+    margin-bottom: 24px; text-align: left;
+  }
+
+  .weak-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px; color: var(--wrong);
+    letter-spacing: 2px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .weak-list { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .weak-tag {
+    background: rgba(255,51,102,0.1);
+    border: 1px solid rgba(255,51,102,0.4);
+    border-radius: 20px; padding: 4px 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px; color: var(--text);
+  }
+
+  .weak-tag span { color: var(--wrong); }
+
+  .results-actions {
+    display: flex; gap: 14px;
+    justify-content: center; flex-wrap: wrap;
+  }
+
+  .action-btn {
+    border-radius: 10px; padding: 14px 28px;
+    font-family: 'Orbitron', monospace;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 2px; cursor: pointer;
+    transition: all 0.3s; border: 2px solid;
+  }
+
+  .action-btn.primary {
+    background: linear-gradient(135deg, rgba(0,255,136,0.15), rgba(0,212,255,0.15));
+    border-color: var(--neon-cyan); color: var(--neon-cyan);
+  }
+
+  .action-btn.primary:hover {
+    box-shadow: var(--glow-cyan); transform: translateY(-2px);
+    background: rgba(0,212,255,0.2);
+  }
+
+  .action-btn.secondary {
+    background: transparent;
+    border-color: var(--border); color: var(--text-dim);
+  }
+
+  .action-btn.secondary:hover {
+    border-color: var(--text-dim); color: var(--text);
+    transform: translateY(-2px);
+  }
+
+  /* ===================== FINAL SCREEN ===================== */
+  .final-screen { text-align: center; padding: 30px 20px; }
+
+  .final-grade {
+    font-family: 'Orbitron', monospace;
+    font-size: 80px; font-weight: 900;
+    display: block; animation: gradeReveal 1s ease; margin-bottom: 10px;
+  }
+
+  @keyframes gradeReveal {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+
+  .final-message { font-size: 18px; margin-bottom: 8px; font-weight: 600; }
+
+  .new-best-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #ffd700, #ff6600);
+    border-radius: 20px; padding: 4px 16px;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px; font-weight: 700;
+    color: #000; letter-spacing: 2px;
+    margin-bottom: 16px; animation: badgePop 0.5s ease;
+  }
+
+  @keyframes badgePop {
+    0%   { transform: scale(0.5); }
+    70%  { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  .career-panel {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 22px;
+    margin-bottom: 24px; text-align: left;
+  }
+
+  .career-panel-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px; color: var(--neon-cyan);
+    letter-spacing: 3px; margin-bottom: 14px;
+  }
+
+  .career-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .career-stat { display: flex; flex-direction: column; gap: 2px; }
+
+  .career-stat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; color: var(--text-dim);
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+
+  .career-stat-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px; font-weight: 700;
+  }
+
+  /* ===================== PARTICLES ===================== */
+  .particle {
+    position: fixed; pointer-events: none;
+    z-index: 999; font-size: 20px;
+    animation: particleFly 1s ease-out forwards;
+  }
+
+  @keyframes particleFly {
+    0%   { transform: translateY(0) scale(1);    opacity: 1; }
+    100% { transform: translateY(-100px) scale(0); opacity: 0; }
+  }
+
+  /* ===================== TOAST ===================== */
+  .toast {
+    position: fixed; top: 20px; right: 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--neon-green);
+    border-radius: 10px; padding: 12px 20px;
+    font-family: 'Orbitron', monospace;
+    font-size: 13px; color: var(--neon-green);
+    box-shadow: var(--glow-green); z-index: 1000;
+    animation: toastIn 0.3s ease, toastOut 0.3s ease 1.7s forwards;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  @keyframes toastIn  { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes toastOut { from { transform: translateX(0); opacity: 1; }     to { transform: translateX(100px); opacity: 0; } }
+
+  /* ===================== LEVEL UP ===================== */
+  .levelup-overlay {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 999; pointer-events: none;
+    animation: overlayFlash 2s ease forwards;
+  }
+
+  @keyframes overlayFlash {
+    0%   { background: rgba(191,0,255,0); }
+    20%  { background: rgba(191,0,255,0.2); }
+    100% { background: rgba(191,0,255,0); }
+  }
+
+  .levelup-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 36px; font-weight: 900;
+    color: var(--neon-purple); text-shadow: var(--glow-purple);
+    animation: levelupText 2s ease forwards; text-align: center;
+  }
+
+  @keyframes levelupText {
+    0%   { transform: scale(0.5) translateY(20px); opacity: 0; }
+    30%  { transform: scale(1.1) translateY(0);    opacity: 1; }
+    70%  { transform: scale(1)   translateY(0);    opacity: 1; }
+    100% { transform: scale(0.8) translateY(-20px);opacity: 0; }
+  }
+
+  /* ===================== MODAL ===================== */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.75);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 3000; animation: fadeIn 0.2s ease;
+  }
+
+  .modal-box {
+    background: var(--card-bg);
+    border: 2px solid var(--wrong);
+    border-radius: 16px; padding: 32px;
+    max-width: 380px; width: 90%;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(255,51,102,0.3);
+  }
+
+  .modal-icon  { font-size: 48px; margin-bottom: 12px; }
+  .modal-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px; font-weight: 700;
+    color: var(--wrong); letter-spacing: 2px; margin-bottom: 10px;
+  }
+
+  .modal-body  {
+    font-size: 14px; color: var(--text-dim);
+    line-height: 1.6; margin-bottom: 24px;
+  }
+
+  .modal-actions { display: flex; gap: 12px; justify-content: center; }
+
+  .modal-btn {
+    border-radius: 8px; padding: 10px 24px;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 2px; cursor: pointer;
+    transition: all 0.3s; border: 2px solid;
+  }
+
+  .modal-btn.danger {
+    background: rgba(255,51,102,0.15);
+    border-color: var(--wrong); color: var(--wrong);
+  }
+
+  .modal-btn.danger:hover {
+    background: rgba(255,51,102,0.3);
+    box-shadow: 0 0 15px rgba(255,51,102,0.4);
+  }
+
+  .modal-btn.cancel {
+    background: transparent;
+    border-color: var(--border); color: var(--text-dim);
+  }
+
+  .modal-btn.cancel:hover { border-color: var(--text-dim); color: var(--text); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
+
+  @media (max-width: 600px) {
+    .logo-title       { font-size: 28px; }
+    .port-number-big  { font-size: 36px; }
+    .service-name-big { font-size: 24px; }
+    .game-header      { gap: 8px; }
+    .score-value      { font-size: 18px; }
+    .difficulty-cards { flex-direction: column; align-items: center; }
+    .diff-card        { max-width: 100%; min-width: unset; width: 100%; }
+    .pb-stats         { gap: 12px; }
+    .career-grid      { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="save-indicator" id="saveIndicator">
+  <div class="save-dot"></div><span>SAVED</span>
+</div>
+
+<!-- ===== START SCREEN ===== -->
+<div id="startScreen" class="screen active">
+  <div class="container">
+    <div class="start-screen">
+
+      <div class="logo-area">
+        <span class="logo-icon">🌐</span>
+        <div class="logo-title">NETPORT QUIZ</div>
+        <div class="logo-sub">// MASTER THE PORTS //</div>
+      </div>
+
+      <div class="persistent-banner">
+        <div class="pb-left">
+          <div class="pb-avatar" id="pbAvatar">🔰</div>
+          <div>
+            <div class="pb-level" id="pbLevel">BEGINNER</div>
+            <div class="pb-xp"    id="pbXpText">0 XP total</div>
+            <div class="pb-xp-bar-bg">
+              <div class="pb-xp-bar-fill" id="pbXpBar" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="pb-stats">
+          <div class="pb-stat"><span class="pb-stat-val cyan"   id="pbTotalGames">0</span>   <span class="pb-stat-lbl">Games</span></div>
+          <div class="pb-stat"><span class="pb-stat-val green"  id="pbTotalCorrect">0</span> <span class="pb-stat-lbl">Correct</span></div>
+          <div class="pb-stat"><span class="pb-stat-val gold"   id="pbBestScore">0</span>    <span class="pb-stat-lbl">Best Score</span></div>
+          <div class="pb-stat"><span class="pb-stat-val orange" id="pbBestStreak">0🔥</span> <span class="pb-stat-lbl">Best Streak</span></div>
+        </div>
+        <button class="pb-reset-btn" onclick="confirmReset()">RESET</button>
+      </div>
+
+      <div class="scan-line"></div>
+
+      <div class="section-label">// SELECT DIFFICULTY //</div>
+      <div class="difficulty-cards">
+        <div class="diff-card easy selected" onclick="selectDifficulty('easy',this)">
+          <div class="diff-icon">🟢</div>
+          <div class="diff-name">EASY</div>
+          <div class="diff-desc">Common protocols every sysadmin knows</div>
+          <div class="diff-ports">HTTP · SSH · FTP · DNS · HTTPS</div>
+          <div class="diff-best" id="bestEasy"></div>
+        </div>
+        <div class="diff-card medium" onclick="selectDifficulty('medium',this)">
+          <div class="diff-icon">🟡</div>
+          <div class="diff-name">MEDIUM</div>
+          <div class="diff-desc">Database &amp; infrastructure ports</div>
+          <div class="diff-ports">MySQL · RDP · LDAP · Redis · SNMP</div>
+          <div class="diff-best" id="bestMedium"></div>
+        </div>
+        <div class="diff-card hard" onclick="selectDifficulty('hard',this)">
+          <div class="diff-icon">🔴</div>
+          <div class="diff-name">HARD</div>
+          <div class="diff-desc">All 100 ports + tricky similar numbers</div>
+          <div class="diff-ports">BGP · Kerberos · ISAKMP · WinRM</div>
+          <div class="diff-best" id="bestHard"></div>
+        </div>
+      </div>
+
+      <div class="section-label">// NUMBER OF QUESTIONS //</div>
+      <div class="q-count-selector">
+        <button class="q-count-btn"          onclick="selectCount(10,this)">10</button>
+        <button class="q-count-btn selected" onclick="selectCount(20,this)">20</button>
+        <button class="q-count-btn"          onclick="selectCount(30,this)">30</button>
+        <button class="q-count-btn"          onclick="selectCount(50,this)">50</button>
+      </div>
+
+      <button class="start-btn" onclick="startGame()">⚡ INITIALIZE QUIZ ⚡</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="gameScreen" class="screen">
+  <div class="container">
+
+    <div class="game-header">
+      <div class="score-block">
+        <span class="score-label">SCORE</span>
+        <span class="score-value" id="scoreVal">0</span>
+      </div>
+      <div class="streak-block" id="streakBlock">
+        <span class="score-label">STREAK</span>
+        <span class="streak-display" id="streakVal">0🔥</span>
+      </div>
+      <div class="xp-area">
+        <div class="xp-header">
+          <span class="level-name" id="levelName">BEGINNER</span>
+          <span class="xp-text"    id="xpText">0 / 200 XP</span>
+        </div>
+        <div class="xp-bar-bg">
+          <div class="xp-bar-fill" id="xpBar" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-area">
+      <div class="progress-header">
+        <span class="progress-text"    id="progressText">Question 1 of 20</span>
+        <span class="difficulty-badge easy" id="diffBadge">EASY</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="question-card" id="questionCard">
+      <div class="q-category">
+        <span class="q-cat-icon"   id="qCatIcon">🌐</span>
+        <span class="q-cat-name"   id="qCatName">WEB PROTOCOL</span>
+        <span class="q-type-badge" id="qTypeBadge">PORT → SERVICE</span>
+      </div>
+      <div class="question-text" id="questionText">What service runs on port:</div>
+      <span id="questionMain"></span>
+    </div>
+
+    <div class="answers-grid" id="answersGrid"></div>
+
+    <div class="explanation-card" id="explanationCard">
+      <div class="exp-header">
+        <span class="exp-result-icon"    id="expResultIcon">✅</span>
+        <span class="exp-result-text"    id="expResultText">CORRECT!</span>
+        <span class="exp-correct-answer" id="expCorrectAnswer"></span>
+      </div>
+      <div class="exp-grid">
+        <div class="exp-section">
+          <div class="exp-section-title">📡 WHAT IT DOES</div>
+          <div class="exp-section-content" id="expWhat"></div>
+        </div>
+        <div class="exp-section">
+          <div class="exp-section-title">🌍 REAL WORLD USE</div>
+          <div class="exp-section-content" id="expUse"></div>
+        </div>
+        <div class="exp-section">
+          <div class="exp-section-title">🔢 PORT DETAILS</div>
+          <div class="exp-section-content" id="expDetails"></div>
+        </div>
+      </div>
+      <div class="memory-tip">
+        <span class="tip-icon">🧠</span>
+        <span id="expTip"></span>
+      </div>
+    </div>
+
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">NEXT QUESTION →</button>
+  </div>
+</div>
+
+<!-- ===== CHECKPOINT ===== -->
+<div id="resultsScreen" class="screen">
+  <div class="container">
+    <div class="results-screen" id="resultsContent"></div>
+  </div>
+</div>
+
+<!-- ===== FINAL SCREEN ===== -->
+<div id="finalScreen" class="screen">
+  <div class="container">
+    <div class="final-screen" id="finalContent"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  PORT DATABASE
+// ═══════════════════════════════════════════════════════════════
+const PORT_DB = [
+  { port:80,    service:"HTTP",          category:"🌐 Web",       icon:"🌐", difficulty:"easy",
+    what:"HyperText Transfer Protocol — the foundation of the web.",
+    use:"Every website without SSL. Browser requests, REST APIs.",
+    details:"TCP 80. Unencrypted. RFC 2616.",
+    tip:"80 = HTTP. Think '80s internet — everything was wide open!" },
+
+  { port:443,   service:"HTTPS",         category:"🔐 Security",  icon:"🔐", difficulty:"easy",
+    what:"HTTP Secure — HTTP encrypted with TLS/SSL.",
+    use:"Online banking, e-commerce, every modern website.",
+    details:"TCP 443. TLS 1.3 is current standard.",
+    tip:"443 = HTTPS. 4+4+3=11 layers of security!" },
+
+  { port:8080,  service:"HTTP-Alt",      category:"🌐 Web",       icon:"🌐", difficulty:"medium",
+    what:"Alternative HTTP port for proxies or dev servers.",
+    use:"Tomcat default, dev environments, Kubernetes API.",
+    details:"TCP 8080. Very common in dev/ops.",
+    tip:"8080 = HTTP backup. Double the 80!" },
+
+  { port:8443,  service:"HTTPS-Alt",     category:"🔐 Security",  icon:"🔐", difficulty:"hard",
+    what:"Alternative HTTPS port used by application servers.",
+    use:"Tomcat HTTPS, Kubernetes Dashboard.",
+    details:"TCP 8443. Like 8080 is to 80, 8443 is to 443.",
+    tip:"8443 = HTTPS-Alt. 443 with an 8 prefix." },
+
+  { port:25,    service:"SMTP",          category:"📧 Email",     icon:"📧", difficulty:"easy",
+    what:"Simple Mail Transfer Protocol — sends emails between servers.",
+    use:"Server-to-server email delivery.",
+    details:"TCP 25. Unencrypted. Often ISP-blocked. RFC 5321.",
+    tip:"25 = SMTP. 'Send Mail Through Port 25'!" },
+
+  { port:587,   service:"SMTP-TLS",      category:"📧 Email",     icon:"📧", difficulty:"medium",
+    what:"SMTP with STARTTLS — encrypted email submission.",
+    use:"Email clients sending through a mail server.",
+    details:"TCP 587. Requires STARTTLS. Modern submission standard.",
+    tip:"587 = SMTP submission. '5-8-7 send it!'" },
+
+  { port:465,   service:"SMTPS",         category:"📧 Email",     icon:"📧", difficulty:"hard",
+    what:"SMTP over SSL — legacy secure email submission.",
+    use:"Older email clients. Gmail still supports 465.",
+    details:"TCP 465. RFC 8314 recommends 587 instead.",
+    tip:"465 = SMTPS. '4-6-5 secure five'." },
+
+  { port:110,   service:"POP3",          category:"📧 Email",     icon:"📧", difficulty:"easy",
+    what:"Post Office Protocol v3 — downloads and deletes email from server.",
+    use:"Legacy email clients for offline reading.",
+    details:"TCP 110. Unencrypted. POP3S on 995. RFC 1939.",
+    tip:"110 = POP3. POP goes 'pop!' at 110." },
+
+  { port:995,   service:"POP3S",         category:"📧 Email",     icon:"📧", difficulty:"hard",
+    what:"POP3 Secure — POP3 over SSL/TLS.",
+    use:"Secure POP3 email retrieval.",
+    details:"TCP 995. Encrypted POP3.",
+    tip:"995 = POP3S. '9-9-5 secure POP3'." },
+
+  { port:143,   service:"IMAP",          category:"📧 Email",     icon:"📧", difficulty:"easy",
+    what:"Internet Message Access Protocol — syncs email across devices.",
+    use:"Outlook, Thunderbird — keeps mail on server.",
+    details:"TCP 143. Unencrypted. IMAPS on 993. RFC 9051.",
+    tip:"143 = IMAP. '143' means 'I Love You' — you'll love IMAP!" },
+
+  { port:993,   service:"IMAPS",         category:"📧 Email",     icon:"📧", difficulty:"medium",
+    what:"IMAP Secure — IMAP over SSL/TLS.",
+    use:"Secure email from mobile apps and desktop clients.",
+    details:"TCP 993. Encrypted IMAP.",
+    tip:"993 = IMAPS. '9-9-3 IMAP Secure Three'." },
+
+  { port:20,    service:"FTP-Data",      category:"📁 File",      icon:"📁", difficulty:"easy",
+    what:"FTP Data channel — carries actual file bytes in active mode.",
+    use:"Active FTP transfers (separate from control on 21).",
+    details:"TCP 20. Active mode only.",
+    tip:"20 = FTP-Data. Data before control: 20 before 21." },
+
+  { port:21,    service:"FTP",           category:"📁 File",      icon:"📁", difficulty:"easy",
+    what:"File Transfer Protocol control — sends FTP commands.",
+    use:"Legacy hosting uploads, backup systems.",
+    details:"TCP 21. Unencrypted. RFC 959.",
+    tip:"21 = FTP. '21 gun salute for the oldest file protocol!'" },
+
+  { port:22,    service:"SSH",           category:"🔐 Security",  icon:"🔐", difficulty:"easy",
+    what:"Secure Shell — encrypted remote login, file transfer, tunnelling.",
+    use:"Server admin, git, SCP/SFTP, port forwarding.",
+    details:"TCP 22. Replaces Telnet. RSA/Ed25519 keys. RFC 4251.",
+    tip:"22 = SSH. Came right after FTP (21) and before Telnet (23)." },
+
+  { port:990,   service:"FTPS",          category:"📁 File",      icon:"📁", difficulty:"hard",
+    what:"FTP Secure — FTP over SSL/TLS implicit mode.",
+    use:"Secure FTP control connections.",
+    details:"TCP 990. Compare SFTP (22) which uses SSH.",
+    tip:"990 = FTPS. '9-9-0 secure FTP go!'" },
+
+  { port:69,    service:"TFTP",          category:"📁 File",      icon:"📁", difficulty:"medium",
+    what:"Trivial File Transfer Protocol — simple transfer, no auth.",
+    use:"PXE booting, firmware updates, router config backup.",
+    details:"UDP 69. No auth, no encryption. RFC 1350.",
+    tip:"69 = TFTP. 'Trivial = tiny number'. Famously memorable!" },
+
+  { port:53,    service:"DNS",           category:"🌍 Network",   icon:"🌍", difficulty:"easy",
+    what:"Domain Name System — translates domain names to IPs.",
+    use:"Every internet connection. Resolving google.com.",
+    details:"TCP & UDP 53. UDP for queries, TCP for zone transfers. RFC 1035.",
+    tip:"DNS is 53. 5 letters in NAMES, 3 in NET!" },
+
+  { port:67,    service:"DHCP-Server",   category:"🌍 Network",   icon:"🌍", difficulty:"easy",
+    what:"DHCP Server — assigns IP addresses to clients.",
+    use:"Your router gives IPs to devices.",
+    details:"UDP 67 (server). Client uses 68. RFC 2131.",
+    tip:"67 = DHCP server. 67+1=68 for the client!" },
+
+  { port:68,    service:"DHCP-Client",   category:"🌍 Network",   icon:"🌍", difficulty:"easy",
+    what:"DHCP Client — receives IP configuration.",
+    use:"Your laptop/phone requesting an IP on WiFi.",
+    details:"UDP 68. Broadcasts DISCOVER, gets OFFER, sends REQUEST.",
+    tip:"68 = DHCP client. 67 server → 68 client." },
+
+  { port:123,   service:"NTP",           category:"🌍 Network",   icon:"⏱️", difficulty:"medium",
+    what:"Network Time Protocol — synchronises clocks across the network.",
+    use:"Server time sync, logging accuracy, Kerberos auth.",
+    details:"UDP 123. Hierarchical stratum. GPS as stratum 0. RFC 5905.",
+    tip:"123 = NTP. '1-2-3 tick-tock!' Counts like seconds!" },
+
+  { port:161,   service:"SNMP",          category:"📊 Monitor",   icon:"📊", difficulty:"medium",
+    what:"Simple Network Management Protocol — monitors network devices.",
+    use:"Nagios, Zabbix, router/switch management.",
+    details:"UDP 161 (agent). Traps on 162. SNMPv3 adds encryption.",
+    tip:"161 = SNMP. '161 degrees of network monitoring.'" },
+
+  { port:162,   service:"SNMP-Trap",     category:"📊 Monitor",   icon:"📊", difficulty:"hard",
+    what:"SNMP Trap — alert notifications from devices to manager.",
+    use:"Alerts when device goes down or threshold exceeded.",
+    details:"UDP 162. SNMPv3 Informs need ACK.",
+    tip:"162 = SNMP Trap. It's 161+1 — traps to the next port!" },
+
+  { port:179,   service:"BGP",           category:"🌍 Network",   icon:"🔀", difficulty:"medium",
+    what:"Border Gateway Protocol — the internet's core routing protocol.",
+    use:"ISP-to-ISP routing. Routes ALL internet traffic.",
+    details:"TCP 179. Path-vector EGP. RFC 4271.",
+    tip:"179 = BGP. 'BGP keeps 1-7-9 billion routes organised!'" },
+
+  { port:520,   service:"RIP",           category:"🌍 Network",   icon:"🔀", difficulty:"hard",
+    what:"Routing Information Protocol — distance-vector for small networks.",
+    use:"Small networks. Mostly replaced by OSPF/EIGRP.",
+    details:"UDP 520. Max 15 hops. RIPng on 521.",
+    tip:"520 = RIP. 'RIP — an older protocol that's mostly dead!'" },
+
+  { port:23,    service:"Telnet",        category:"💻 Remote",    icon:"💻", difficulty:"easy",
+    what:"Telnet — unencrypted remote terminal. ALL data in plaintext.",
+    use:"Legacy device management. Testing TCP connectivity.",
+    details:"TCP 23. Completely insecure. RFC 854.",
+    tip:"23 = Telnet. Use SSH (22) — one port earlier and secure!" },
+
+  { port:3389,  service:"RDP",           category:"💻 Remote",    icon:"💻", difficulty:"easy",
+    what:"Remote Desktop Protocol — Microsoft's graphical remote desktop.",
+    use:"Windows admin, virtual desktops, remote work.",
+    details:"TCP & UDP 3389. Microsoft proprietary. NLA recommended.",
+    tip:"3389 = RDP. Just memorise it — THE Windows remote port!" },
+
+  { port:5900,  service:"VNC",           category:"💻 Remote",    icon:"💻", difficulty:"medium",
+    what:"Virtual Network Computing — cross-platform graphical remote desktop.",
+    use:"IT support, Raspberry Pi, Linux/Mac/Windows.",
+    details:"TCP 5900. RFB protocol. 5901 = second display.",
+    tip:"5900 = VNC. '5900 pixels of remote desktop!'" },
+
+  { port:5901,  service:"VNC-2",         category:"💻 Remote",    icon:"💻", difficulty:"hard",
+    what:"VNC second display — base 5900 + display number.",
+    use:"Second VNC session in a multi-user X11 server.",
+    details:"TCP 5901. Display :1.",
+    tip:"5901 = VNC display 1. 5900+1=5901!" },
+
+  { port:2222,  service:"SSH-Alt",       category:"🔐 Security",  icon:"🔐", difficulty:"medium",
+    what:"Alternative SSH port — hides SSH from automated scanners.",
+    use:"Security-conscious admins, some cloud providers.",
+    details:"TCP 2222. Not official but widely used.",
+    tip:"2222 = SSH-Alt. SSH (22) doubled — four 2s!" },
+
+  { port:3306,  service:"MySQL",         category:"🗄️ Database",  icon:"🗄️", difficulty:"easy",
+    what:"MySQL/MariaDB — world's most popular open-source RDBMS.",
+    use:"WordPress, Drupal, LAMP stack.",
+    details:"TCP 3306. Also MariaDB. Often firewalled.",
+    tip:"3306 = MySQL. MySQL → My=3, SQL=306!" },
+
+  { port:5432,  service:"PostgreSQL",    category:"🗄️ Database",  icon:"🗄️", difficulty:"medium",
+    what:"PostgreSQL — advanced open-source relational database.",
+    use:"Serious web apps, GIS, analytics, Django/Rails.",
+    details:"TCP 5432. ACID compliant. JSON, arrays, custom types.",
+    tip:"5432 = PostgreSQL. '5-4-3-2 count down to Postgres!'" },
+
+  { port:27017, service:"MongoDB",       category:"🗄️ Database",  icon:"🗄️", difficulty:"medium",
+    what:"MongoDB — document-oriented NoSQL storing BSON documents.",
+    use:"Real-time apps, Node.js, IoT data.",
+    details:"TCP 27017. BSON format. Replica sets 27017–27019.",
+    tip:"27017 = MongoDB. Long port = big document database!" },
+
+  { port:6379,  service:"Redis",         category:"🗄️ Database",  icon:"🗄️", difficulty:"medium",
+    what:"Redis — in-memory key-value store, cache, message broker.",
+    use:"Session caching, pub/sub, rate limiting, leaderboards.",
+    details:"TCP 6379. No auth by default! Lua scripting.",
+    tip:"6379 = Redis. MERZ on a phone keypad — named after a TV show!" },
+
+  { port:5984,  service:"CouchDB",       category:"🗄️ Database",  icon:"🗄️", difficulty:"hard",
+    what:"CouchDB — document NoSQL with a REST/HTTP API.",
+    use:"Offline-first apps, document storage.",
+    details:"TCP 5984. HTTP/REST. MapReduce. Apache project.",
+    tip:"5984 = CouchDB. '59-84 — CouchDB on the couch!'" },
+
+  { port:9200,  service:"Elasticsearch", category:"🗄️ Database",  icon:"🔍", difficulty:"medium",
+    what:"Elasticsearch — distributed search engine (Apache Lucene).",
+    use:"Full-text search, log analytics (ELK), metrics.",
+    details:"TCP 9200 (REST), 9300 (cluster). Kibana on 5601.",
+    tip:"9200 = Elasticsearch. REST API at 9200." },
+
+  { port:9300,  service:"ES-Cluster",    category:"🗄️ Database",  icon:"🔍", difficulty:"hard",
+    what:"Elasticsearch cluster transport — inter-node communication.",
+    use:"ES node-to-node. Not for external clients.",
+    details:"TCP 9300. Transport protocol only.",
+    tip:"9300 = ES Cluster. 9200 REST + 100 = 9300 cluster!" },
+
+  { port:1433,  service:"MSSQL",         category:"🗄️ Database",  icon:"🗄️", difficulty:"medium",
+    what:"Microsoft SQL Server — Microsoft's enterprise RDBMS.",
+    use:"Windows enterprise, .NET backends, SharePoint.",
+    details:"TCP 1433. UDP 1434 for SQL Browser.",
+    tip:"1433 = MSSQL. 1+4+3+3=11, SQL has 3 letters." },
+
+  { port:1521,  service:"Oracle DB",     category:"🗄️ Database",  icon:"🗄️", difficulty:"medium",
+    what:"Oracle Database TNS listener.",
+    use:"Large enterprise ERP systems, SAP.",
+    details:"TCP 1521. TNS listener. Oracle 10g+.",
+    tip:"1521 = Oracle DB. '15-21 — Oracle's been around ages!'" },
+
+  { port:5601,  service:"Kibana",        category:"📊 Monitor",   icon:"📊", difficulty:"hard",
+    what:"Kibana — visualisation UI for the Elastic/ELK Stack.",
+    use:"Log dashboards, Elasticsearch management.",
+    details:"TCP 5601. Connects to ES on 9200.",
+    tip:"5601 = Kibana. Near 5432 (PostgreSQL) in port space." },
+
+  { port:389,   service:"LDAP",          category:"🔑 Auth",      icon:"🔑", difficulty:"medium",
+    what:"Lightweight Directory Access Protocol — queries directory services.",
+    use:"Active Directory, corporate login, user management.",
+    details:"TCP & UDP 389. Unencrypted. LDAPS on 636. RFC 4511.",
+    tip:"389 = LDAP. 'LDAP is a 389-page phonebook for network users!'" },
+
+  { port:636,   service:"LDAPS",         category:"🔑 Auth",      icon:"🔑", difficulty:"hard",
+    what:"LDAP Secure — LDAP over SSL/TLS.",
+    use:"Secure Active Directory queries.",
+    details:"TCP 636. Encrypted LDAP.",
+    tip:"636 = LDAPS. '6-3-6 secure directory!'" },
+
+  { port:88,    service:"Kerberos",      category:"🔑 Auth",      icon:"🔑", difficulty:"medium",
+    what:"Kerberos — ticket-based network authentication.",
+    use:"Windows AD auth, SSO, Hadoop security.",
+    details:"TCP & UDP 88. Requires NTP sync!",
+    tip:"88 = Kerberos. '88 mph like Back to the Future!'" },
+
+  { port:464,   service:"Kerberos-kpwd", category:"🔑 Auth",      icon:"🔑", difficulty:"hard",
+    what:"Kerberos password change protocol.",
+    use:"AD password changes, MIT Kerberos updates.",
+    details:"TCP & UDP 464. RFC 3244.",
+    tip:"464 = Kerberos password. '4-6-4 change your door code!'" },
+
+  { port:445,   service:"SMB",           category:"📁 File",      icon:"📁", difficulty:"easy",
+    what:"Server Message Block — Windows file/printer sharing.",
+    use:"Windows shares, WannaCry ransomware target!",
+    details:"TCP 445. SMB2/SMB3. EternalBlue exploit target.",
+    tip:"445 = SMB. '4-4-5 Windows shares!' Always patch SMB!" },
+
+  { port:139,   service:"NetBIOS-SSN",   category:"📁 File",      icon:"📁", difficulty:"medium",
+    what:"NetBIOS Session — older Windows file sharing.",
+    use:"Legacy Windows sharing. Modern uses SMB on 445.",
+    details:"TCP 139. 137=Name, 138=Datagram, 139=Session.",
+    tip:"139 = NetBIOS-SSN. '1-3-9 the old Windows sharing trio!'" },
+
+  { port:137,   service:"NetBIOS-NS",    category:"📁 File",      icon:"📁", difficulty:"hard",
+    what:"NetBIOS Name Service — resolves NetBIOS names to IPs.",
+    use:"Legacy Windows name resolution, WINS.",
+    details:"UDP 137. RFC 1001/1002.",
+    tip:"137 = NetBIOS NS. 137 Name, 138 Datagram, 139 Session!" },
+
+  { port:2049,  service:"NFS",           category:"📁 File",      icon:"📁", difficulty:"medium",
+    what:"Network File System — Unix/Linux distributed filesystem.",
+    use:"NAS, Linux sharing, Kubernetes persistent volumes.",
+    details:"TCP & UDP 2049. NFSv4 TCP only.",
+    tip:"2049 = NFS. '2-0-4-9 — NFS gives you 2049 more files!'" },
+
+  { port:111,   service:"RPCBind",       category:"🌍 Network",   icon:"🌍", difficulty:"hard",
+    what:"RPCBind/Portmapper — maps RPC services to ports.",
+    use:"Required for NFS. RPC service discovery.",
+    details:"TCP & UDP 111. Sunrpc. RFC 1833.",
+    tip:"111 = RPCBind. '111 — three ones, three remote procedures!'" },
+
+  { port:500,   service:"ISAKMP",        category:"🔐 Security",  icon:"🔐", difficulty:"medium",
+    what:"ISAKMP — sets up IPsec VPN tunnels via IKEv1/IKEv2.",
+    use:"IPsec VPN, site-to-site VPN key exchange.",
+    details:"UDP 500. IKE. Works with ESP (protocol 50). RFC 7296.",
+    tip:"500 = ISAKMP/IKE. '500 — round number for VPN tunnels!'" },
+
+  { port:4500,  service:"IPSec-NAT-T",   category:"🔐 Security",  icon:"🔐", difficulty:"hard",
+    what:"IPsec NAT Traversal — lets IPsec work through NAT.",
+    use:"VPN clients behind NAT, mobile VPN.",
+    details:"UDP 4500. Encapsulates ESP in UDP. RFC 3948.",
+    tip:"4500 = IPsec NAT-T. '4500 miles through NAT!'" },
+
+  { port:1194,  service:"OpenVPN",       category:"🔐 Security",  icon:"🔐", difficulty:"medium",
+    what:"OpenVPN — popular SSL/TLS-based VPN protocol.",
+    use:"Commercial VPNs, company VPNs, censorship bypass.",
+    details:"UDP (or TCP) 1194. TLS-based. Cross-platform.",
+    tip:"1194 = OpenVPN. 'Open(1)V(1)P(9)N(4)'!" },
+
+  { port:1723,  service:"PPTP",          category:"🔐 Security",  icon:"🔐", difficulty:"medium",
+    what:"PPTP — legacy VPN with known weaknesses.",
+    use:"Old Windows VPN. NOT recommended — broken!",
+    details:"TCP 1723. Uses GRE (47). MS-CHAPv2 is broken!",
+    tip:"1723 = PPTP. '1723 old as the year and just as insecure!'" },
+
+  { port:1701,  service:"L2TP",          category:"🔐 Security",  icon:"🔐", difficulty:"hard",
+    what:"L2TP — VPN tunnelling paired with IPsec.",
+    use:"L2TP/IPsec VPN, Windows built-in VPN.",
+    details:"UDP 1701. No encryption — relies on IPsec. RFC 2661.",
+    tip:"1701 = L2TP. 'USS Enterprise NCC-1701 — boldly tunnels!'" },
+
+  { port:5222,  service:"XMPP",          category:"💬 Chat",      icon:"💬", difficulty:"hard",
+    what:"XMPP — open-standard instant messaging protocol.",
+    use:"Jabber, WhatsApp (modified), corporate chat.",
+    details:"TCP 5222 (client), 5269 (server). RFC 6120.",
+    tip:"5222 = XMPP. '52-22 — five-two, twenty-two, XMPP!'" },
+
+  { port:5269,  service:"XMPP-S2S",      category:"💬 Chat",      icon:"💬", difficulty:"hard",
+    what:"XMPP Server-to-Server — federation between XMPP servers.",
+    use:"Cross-server instant messaging.",
+    details:"TCP 5269. RFC 6121.",
+    tip:"5269 = XMPP S2S. Client 5222 → Server 5269." },
+
+  { port:5060,  service:"SIP",           category:"📞 VoIP",      icon:"📞", difficulty:"medium",
+    what:"Session Initiation Protocol — sets up VoIP calls.",
+    use:"VoIP phones, Skype for Business.",
+    details:"TCP & UDP 5060. SIPS on 5061. RFC 3261.",
+    tip:"5060 = SIP. 'Dial 5060 to start a VoIP call!'" },
+
+  { port:5061,  service:"SIPS",          category:"📞 VoIP",      icon:"📞", difficulty:"hard",
+    what:"SIP Secure — SIP over TLS.",
+    use:"Secure VoIP, healthcare compliance.",
+    details:"TCP 5061. TLS-encrypted SIP.",
+    tip:"5061 = SIPS. 5060+1 — secure SIP is one port up!" },
+
+  { port:514,   service:"Syslog",        category:"📊 Monitor",   icon:"📊", difficulty:"medium",
+    what:"Syslog — sends system log messages over the network.",
+    use:"Centralised logging, SIEM, router/switch logs.",
+    details:"UDP 514. TCP for reliable delivery. RFC 5424.",
+    tip:"514 = Syslog. '5-1-4 — five-one-four log it more!'" },
+
+  { port:6514,  service:"Syslog-TLS",    category:"📊 Monitor",   icon:"📊", difficulty:"hard",
+    what:"Syslog over TLS — encrypted centralised logging.",
+    use:"Compliance logging, secure SIEM feeds.",
+    details:"TCP 6514. RFC 5425.",
+    tip:"6514 = Syslog-TLS. Syslog (514) with a '6' prefix!" },
+
+  { port:631,   service:"IPP",           category:"🖨️ Print",     icon:"🖨️", difficulty:"hard",
+    what:"Internet Printing Protocol — network printing over HTTP.",
+    use:"CUPS (Linux/Mac), network printers, AirPrint.",
+    details:"TCP 631. HTTP-based. RFC 8011.",
+    tip:"631 = IPP. '6-3-1 print it!'" },
+
+  { port:515,   service:"LPD",           category:"🖨️ Print",     icon:"🖨️", difficulty:"hard",
+    what:"Line Printer Daemon — legacy Unix network printing.",
+    use:"Legacy printers. Replaced by IPP/CUPS.",
+    details:"TCP 515. BSD-derived. RFC 1179.",
+    tip:"515 = LPD. '5-1-5 print!' Legacy but still seen." },
+
+  { port:1080,  service:"SOCKS",         category:"🔐 Security",  icon:"🔐", difficulty:"medium",
+    what:"SOCKS proxy — generic proxy for TCP/UDP traffic.",
+    use:"Tor, SSH tunnelling, bypassing firewalls.",
+    details:"TCP 1080. SOCKS4/SOCKS5. RFC 1928.",
+    tip:"1080 = SOCKS. '1080p HD — SOCKS gives HD anonymity!'" },
+
+  { port:3268,  service:"LDAP-GC",       category:"🔑 Auth",      icon:"🔑", difficulty:"hard",
+    what:"LDAP Global Catalog — AD forest-wide searches.",
+    use:"Active Directory multi-domain queries.",
+    details:"TCP 3268 (plain), 3269 (SSL).",
+    tip:"3268 = LDAP-GC. Global Catalog — special LDAP port." },
+
+  { port:8161,  service:"ActiveMQ-UI",   category:"📨 Messaging", icon:"📨", difficulty:"hard",
+    what:"ActiveMQ web console — management UI.",
+    use:"ActiveMQ admin, monitoring queues.",
+    details:"TCP 8161. Default admin/admin — change it!",
+    tip:"8161 = ActiveMQ UI. '8 messages, 1 broker, 61 topics!'" },
+
+  { port:61616, service:"ActiveMQ",      category:"📨 Messaging", icon:"📨", difficulty:"hard",
+    what:"Apache ActiveMQ — main JMS message broker port.",
+    use:"Java messaging, enterprise integration.",
+    details:"TCP 61616. OpenWire protocol.",
+    tip:"61616 = ActiveMQ. 'Active! MQ! GO! All the 6s and 1s!'" },
+
+  { port:5672,  service:"AMQP",          category:"📨 Messaging", icon:"📨", difficulty:"hard",
+    what:"Advanced Message Queuing Protocol — open message broker.",
+    use:"RabbitMQ, microservices communication.",
+    details:"TCP 5672. AMQPS on 5671. OASIS standard.",
+    tip:"5672 = AMQP/RabbitMQ. '5672 messages in the queue!'" },
+
+  { port:5671,  service:"AMQPS",         category:"📨 Messaging", icon:"📨", difficulty:"hard",
+    what:"AMQP Secure — AMQP over TLS.",
+    use:"Secure RabbitMQ in production.",
+    details:"TCP 5671. One less than 5672.",
+    tip:"5671 = AMQPS. Secure = port goes down by 1!" },
+
+  { port:9092,  service:"Kafka",         category:"📨 Messaging", icon:"📨", difficulty:"hard",
+    what:"Apache Kafka — distributed event streaming platform.",
+    use:"Real-time streams, event sourcing, log aggregation.",
+    details:"TCP 9092. ZooKeeper on 2181 (legacy).",
+    tip:"9092 = Kafka. '9092 events per millisecond — Kafka is FAST!'" },
+
+  { port:2181,  service:"ZooKeeper",     category:"📨 Messaging", icon:"📨", difficulty:"hard",
+    what:"Apache ZooKeeper — distributed coordination service.",
+    use:"Kafka coordination, leader election.",
+    details:"TCP 2181. 2888/3888 for leader election.",
+    tip:"2181 = ZooKeeper. '21-81 — the zoo opens at 21:81!'" },
+
+  { port:9090,  service:"Prometheus",    category:"📊 Monitor",   icon:"📊", difficulty:"hard",
+    what:"Prometheus — monitoring and alerting toolkit.",
+    use:"Kubernetes monitoring, Grafana data source.",
+    details:"TCP 9090. Pull-based metrics. PromQL. CNCF.",
+    tip:"9090 = Prometheus. 'Stole fire (metrics) at port 9090!'" },
+
+  { port:3000,  service:"Grafana",       category:"📊 Monitor",   icon:"📊", difficulty:"medium",
+    what:"Grafana — analytics and visualisation platform.",
+    use:"Infrastructure dashboards, alerting, K8s monitoring.",
+    details:"TCP 3000 (default). Connects to Prometheus, InfluxDB.",
+    tip:"3000 = Grafana. '3000 graphs at 3 AM monitoring prod!'" },
+
+  { port:4444,  service:"Metasploit",    category:"🔐 Security",  icon:"⚠️", difficulty:"hard",
+    what:"Metasploit default handler — reverse shell listener.",
+    use:"Penetration testing. Also used by malware C2.",
+    details:"TCP 4444. Not official but very common in pentesting.",
+    tip:"4444 = Metasploit. '4444 = for-for-for-for shell back!'" },
+
+  { port:4789,  service:"VXLAN",         category:"🌍 Network",   icon:"🌍", difficulty:"hard",
+    what:"VXLAN — overlays virtual L2 networks over L3.",
+    use:"Docker/Kubernetes networking, cloud virtual networks.",
+    details:"UDP 4789. RFC 7348. Docker swarm default overlay.",
+    tip:"4789 = VXLAN. '4789 virtual networks stacked!'" },
+
+  { port:6443,  service:"K8s-API",       category:"☁️ Cloud",     icon:"☁️", difficulty:"hard",
+    what:"Kubernetes API Server — the control plane endpoint.",
+    use:"kubectl, CI/CD, Helm, all Kubernetes management.",
+    details:"TCP 6443 HTTPS.",
+    tip:"6443 = K8s API. 6 letters in Kube-rn + 443 (HTTPS)!" },
+
+  { port:2376,  service:"Docker-TLS",    category:"☁️ Cloud",     icon:"☁️", difficulty:"hard",
+    what:"Docker daemon TLS — secure Docker API.",
+    use:"Remote Docker management, CI/CD.",
+    details:"TCP 2376. 2375 is unencrypted — never expose!",
+    tip:"2376 = Docker TLS. 2375+1=2376. Always use TLS!" },
+
+  { port:2375,  service:"Docker",        category:"☁️ Cloud",     icon:"☁️", difficulty:"hard",
+    what:"Docker daemon — unencrypted API. Critical risk if exposed.",
+    use:"Local only. Exposing remotely = full host compromise!",
+    details:"TCP 2375. NEVER expose to internet.",
+    tip:"2375 = Docker unencrypted. Like Telnet (23) — dangerous!" },
+
+  { port:9418,  service:"Git",           category:"💻 Dev",       icon:"💻", difficulty:"hard",
+    what:"Native Git protocol — efficient repo cloning/pushing.",
+    use:"git:// URLs, internal Git servers.",
+    details:"TCP 9418. No authentication.",
+    tip:"9418 = Git. '9418 commits pushed!'" },
+
+  { port:873,   service:"rsync",         category:"📁 File",      icon:"📁", difficulty:"hard",
+    what:"rsync — efficient file sync with delta-transfer.",
+    use:"Backups, deployment, mirror servers.",
+    details:"TCP 873. rsync daemon.",
+    tip:"873 = rsync. '8-7-3 — rsync in 873 seconds!'" },
+
+  { port:11211, service:"Memcached",     category:"🗄️ Database",  icon:"🗄️", difficulty:"hard",
+    what:"Memcached — distributed memory caching system.",
+    use:"Web app caching, session storage.",
+    details:"TCP & UDP 11211. No auth! Never expose publicly.",
+    tip:"11211 = Memcached. '1-1-2-1-1 — caches 11211 objects/sec!'" },
+
+  { port:5044,  service:"Logstash",      category:"📊 Monitor",   icon:"📊", difficulty:"hard",
+    what:"Logstash Beats input — receives data from Filebeat.",
+    use:"ELK stack log ingestion.",
+    details:"TCP 5044. Beats protocol. Elastic Stack.",
+    tip:"5044 = Logstash. '50-44 — 5044 logs to ELK!'" },
+
+  { port:4369,  service:"EPMD",          category:"📨 Messaging", icon:"📨", difficulty:"hard",
+    what:"Erlang Port Mapper Daemon — maps Erlang nodes to ports.",
+    use:"RabbitMQ clustering, Erlang distributed apps.",
+    details:"TCP 4369. Required for RabbitMQ clustering.",
+    tip:"4369 = EPMD. '4369 Erlang processes mapped!'" },
+
+  { port:27018, service:"MongoDB-Shard", category:"🗄️ Database",  icon:"🗄️", difficulty:"hard",
+    what:"MongoDB shard server — mongod as a shard.",
+    use:"MongoDB sharded clusters for horizontal scaling.",
+    details:"TCP 27018. 27017 standard, 27019 config server.",
+    tip:"27018 = MongoDB Shard. 27017+1 — next door to Mongo!" },
+
+  { port:5353,  service:"mDNS",          category:"🌍 Network",   icon:"🌍", difficulty:"medium",
+    what:"Multicast DNS — zero-config DNS for local discovery.",
+    use:"Apple Bonjour, Avahi, printer discovery.",
+    details:"UDP 5353. Multicast 224.0.0.251. RFC 6762.",
+    tip:"5353 = mDNS. DNS (53) doubled for local network!" },
+
+  { port:5355,  service:"LLMNR",         category:"🌍 Network",   icon:"🌍", difficulty:"hard",
+    what:"LLMNR — Windows name resolution without DNS.",
+    use:"Windows local name resolution. Responder attack target!",
+    details:"UDP & TCP 5355. RFC 4795. Disable in production!",
+    tip:"5355 = LLMNR. Near mDNS (5353). Both local name resolution!" },
+
+  { port:1900,  service:"SSDP",          category:"🌍 Network",   icon:"🌍", difficulty:"hard",
+    what:"Simple Service Discovery — UPnP device discovery.",
+    use:"Smart TVs, game consoles, smart home, UPnP routers.",
+    details:"UDP 1900. Multicast 239.255.255.250. DDoS risk!",
+    tip:"1900 = SSDP. 'Discovering devices since the year 1900!'" },
+
+  { port:8883,  service:"MQTT-TLS",      category:"📨 Messaging", icon:"📨", difficulty:"hard",
+    what:"MQTT over TLS — secure IoT messaging.",
+    use:"Secure IoT devices, smart home, AWS IoT.",
+    details:"TCP 8883. 1883 is plain MQTT.",
+    tip:"8883 = MQTT-TLS. Plain 1883 → secure 8883." },
+
+  { port:1883,  service:"MQTT",          category:"📨 Messaging", icon:"📨", difficulty:"medium",
+    what:"MQTT — lightweight IoT pub/subscribe protocol.",
+    use:"IoT sensors, Home Assistant, telemetry.",
+    details:"TCP 1883. QoS 0/1/2. OASIS standard.",
+    tip:"1883 = MQTT. Memorable year!" },
+
+  { port:8500,  service:"Consul",        category:"☁️ Cloud",     icon:"☁️", difficulty:"hard",
+    what:"HashiCorp Consul — service mesh and discovery.",
+    use:"Microservice discovery, health checks, service mesh.",
+    details:"TCP 8500 HTTP, 8501 HTTPS, 8600 DNS.",
+    tip:"8500 = Consul. '85-00 — Consul discovered 8500 services!'" },
+
+  { port:8200,  service:"Vault",         category:"🔐 Security",  icon:"🔐", difficulty:"hard",
+    what:"HashiCorp Vault — secrets management.",
+    use:"API keys, certificates, passwords, dynamic secrets.",
+    details:"TCP 8200 HTTPS REST API. 8201 cluster.",
+    tip:"8200 = Vault. '8200 secrets locked in the vault!'" },
+
+  { port:9000,  service:"MinIO",         category:"☁️ Cloud",     icon:"☁️", difficulty:"hard",
+    what:"MinIO — S3-compatible object storage.",
+    use:"On-premise S3 storage, Kubernetes storage.",
+    details:"TCP 9000. S3-compatible REST API.",
+    tip:"9000 = MinIO. 'Over 9000 objects in storage!'" },
+
+  { port:10250, service:"Kubelet",       category:"☁️ Cloud",     icon:"☁️", difficulty:"hard",
+    what:"Kubernetes Kubelet API — node agent managing pods.",
+    use:"Pod management, kubectl exec, node metrics.",
+    details:"TCP 10250 HTTPS. Security critical.",
+    tip:"10250 = Kubelet. '10k pods, 250 kubelets!'" },
+
+  { port:2055,  service:"NetFlow",       category:"📊 Monitor",   icon:"📊", difficulty:"hard",
+    what:"NetFlow — Cisco traffic flow monitoring.",
+    use:"Traffic analysis, bandwidth monitoring.",
+    details:"UDP 2055. Cisco proprietary.",
+    tip:"2055 = NetFlow. '2055 flows monitored!'" },
+
+  { port:3128,  service:"Squid",         category:"🌐 Web",       icon:"🌐", difficulty:"hard",
+    what:"Squid — caching HTTP proxy server.",
+    use:"Corporate web filtering, bandwidth optimisation.",
+    details:"TCP 3128. HTTP/HTTPS proxy.",
+    tip:"3128 = Squid. '31-28 — Squid's suction cups!'" },
+
+  { port:8888,  service:"Jupyter",       category:"🌐 Web",       icon:"📓", difficulty:"hard",
+    what:"Jupyter Notebook — web-based Python/data science IDE.",
+    use:"Data science, ML, research, teaching Python.",
+    details:"TCP 8888. Default Jupyter port. No SSL by default.",
+    tip:"8888 = Jupyter. '8888 — eight notebook cells!'" },
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  PERSISTENCE
+// ═══════════════════════════════════════════════════════════════
+const SAVE_KEY = 'netport_quiz_v3';
+
+const DEFAULT_PERSIST = {
+  totalXP: 0, totalGames: 0, totalCorrect: 0,
+  totalWrong: 0, bestStreak: 0,
+  bestScores: { easy: 0, medium: 0, hard: 0 }
+};
+
+function loadPersist() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return deepClone(DEFAULT_PERSIST);
+    const s = JSON.parse(raw);
+    return {
+      totalXP:      s.totalXP      ?? 0,
+      totalGames:   s.totalGames   ?? 0,
+      totalCorrect: s.totalCorrect ?? 0,
+      totalWrong:   s.totalWrong   ?? 0,
+      bestStreak:   s.bestStreak   ?? 0,
+      bestScores: {
+        easy:   s.bestScores?.easy   ?? 0,
+        medium: s.bestScores?.medium ?? 0,
+        hard:   s.bestScores?.hard   ?? 0
+      }
+    };
+  } catch { return deepClone(DEFAULT_PERSIST); }
+}
+
+function savePersist() {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(persist)); flashSave(); }
+  catch (e) { console.warn('localStorage unavailable:', e); }
+}
+
+function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
+
+let persist = loadPersist();
+
+let saveFlashTimer = null;
+function flashSave() {
+  const el = document.getElementById('saveIndicator');
+  el.classList.add('show');
+  clearTimeout(saveFlashTimer);
+  saveFlashTimer = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  LEVELS
+// ═══════════════════════════════════════════════════════════════
+const LEVELS = [
+  { name:'BEGINNER',       xpNeeded:    0, avatar:'🔰' },
+  { name:'APPRENTICE',     xpNeeded:  200, avatar:'🎓' },
+  { name:'SYSADMIN',       xpNeeded:  500, avatar:'🖥️' },
+  { name:'NET ENGINEER',   xpNeeded: 1000, avatar:'🛰️' },
+  { name:'NETWORK WIZARD', xpNeeded: 2000, avatar:'🧙' },
+];
+
+function getLevelIndex(xp) {
+  let i = 0;
+  for (let j = LEVELS.length - 1; j >= 0; j--) { if (xp >= LEVELS[j].xpNeeded) { i = j; break; } }
+  return i;
+}
+
+function getLevelData(xp) {
+  const idx  = getLevelIndex(xp);
+  const curr = LEVELS[idx];
+  const next = LEVELS[Math.min(idx + 1, LEVELS.length - 1)];
+  const inL  = xp - curr.xpNeeded;
+  const rng  = next.xpNeeded - curr.xpNeeded;
+  const pct  = idx >= LEVELS.length - 1 ? 100 : Math.min(100, Math.floor((inL / rng) * 100));
+  return { idx, curr, next, pct };
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DIFFICULTY POOLS
+// ═══════════════════════════════════════════════════════════════
+const POOLS = {
+  easy:   PORT_DB.filter(p => p.difficulty === 'easy'),
+  medium: PORT_DB.filter(p => p.difficulty === 'easy' || p.difficulty === 'medium'),
+  hard:   PORT_DB
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  SESSION STATE
+// ═══════════════════════════════════════════════════════════════
+let session = {
+  difficulty: 'easy', totalQ: 20,
+  currentQ: 0, score: 0, streak: 0, maxStreak: 0,
+  xpEarned: 0, correct: 0, wrong: 0,
+  wrongPorts: [], questions: [], answered: false,
+  currentBuild: null
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  BANNER
+// ═══════════════════════════════════════════════════════════════
+function refreshBanner() {
+  const ld = getLevelData(persist.totalXP);
+  document.getElementById('pbAvatar').textContent      = ld.curr.avatar;
+  document.getElementById('pbLevel').textContent       = ld.curr.name;
+  document.getElementById('pbXpText').textContent      = `${persist.totalXP.toLocaleString()} XP total`;
+  document.getElementById('pbXpBar').style.width       = ld.pct + '%';
+  document.getElementById('pbTotalGames').textContent  = persist.totalGames.toLocaleString();
+  document.getElementById('pbTotalCorrect').textContent= persist.totalCorrect.toLocaleString();
+  document.getElementById('pbBestScore').textContent   = (persist.bestScores[session.difficulty] || 0).toLocaleString();
+  document.getElementById('pbBestStreak').textContent  = persist.bestStreak + '🔥';
+  ['easy','medium','hard'].forEach(d => {
+    const el  = document.getElementById('best' + d.charAt(0).toUpperCase() + d.slice(1));
+    const val = persist.bestScores[d] || 0;
+    el.textContent = val > 0 ? `🏆 Best: ${val.toLocaleString()} pts` : '';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════════════════════════
+function selectDifficulty(diff, el) {
+  document.querySelectorAll('.diff-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  session.difficulty = diff;
+  const badge = document.getElementById('diffBadge');
+  badge.className = 'difficulty-badge ' + diff;
+  badge.textContent = diff.toUpperCase();
+  document.getElementById('pbBestScore').textContent =
+    (persist.bestScores[diff] || 0).toLocaleString();
+}
+
+function selectCount(n, el) {
+  document.querySelectorAll('.q-count-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  session.totalQ = n;
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showToast(msg, icon = '✅') {
+  const old = document.querySelector('.toast');
+  if (old) old.remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+  document.body.appendChild(t);
+  setTimeout(() => { if (t.parentNode) t.remove(); }, 2100);
+}
+
+function spawnParticles(el, ok) {
+  const r  = el.getBoundingClientRect();
+  const em = ok ? ['✨','⭐','💎','🎯','💡'] : ['💥','❌','😬'];
+  for (let i = 0; i < 5; i++) {
+    const p = document.createElement('div');
+    p.className   = 'particle';
+    p.textContent = em[Math.floor(Math.random() * em.length)];
+    p.style.left  = (r.left + r.width / 2 + (Math.random() - 0.5) * 80) + 'px';
+    p.style.top   = (r.top  + Math.random() * r.height) + 'px';
+    p.style.animationDelay = (Math.random() * 0.3) + 's';
+    document.body.appendChild(p);
+    setTimeout(() => { if (p.parentNode) p.remove(); }, 1200);
+  }
+}
+
+function showLevelUp(name) {
+  const o = document.createElement('div');
+  o.className = 'levelup-overlay';
+  o.innerHTML = `<div class="levelup-text">⬆️ LEVEL UP!<br><span style="font-size:20px">${name}</span></div>`;
+  document.body.appendChild(o);
+  setTimeout(() => { if (o.parentNode) o.remove(); }, 2100);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RESET MODAL
+// ═══════════════════════════════════════════════════════════════
+function confirmReset() {
+  const m = document.createElement('div');
+  m.className = 'modal-overlay';
+  m.id = 'resetModal';
+  m.innerHTML = `
+    <div class="modal-box">
+      <div class="modal-icon">⚠️</div>
+      <div class="modal-title">RESET PROGRESS?</div>
+      <div class="modal-body">
+        This will permanently erase your XP, level, all scores and statistics.<br><br>
+        <strong style="color:var(--wrong)">This cannot be undone.</strong>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn danger" onclick="executeReset()">WIPE DATA</button>
+        <button class="modal-btn cancel" onclick="closeModal()">CANCEL</button>
+      </div>
+    </div>`;
+  document.body.appendChild(m);
+}
+
+function closeModal() { const m = document.getElementById('resetModal'); if (m) m.remove(); }
+
+function executeReset() {
+  closeModal();
+  persist = deepClone(DEFAULT_PERSIST);
+  savePersist();
+  refreshBanner();
+  showToast('All progress wiped.', '🗑️');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  QUESTION GENERATION
+// ═══════════════════════════════════════════════════════════════
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildDecoys(correct, pool, type) {
+  const others = shuffle(pool.filter(p => p.port !== correct.port));
+  if (type === 'service') {
+    const res = [], seen = new Set([correct.service]);
+    for (const p of others) {
+      if (!seen.has(p.service)) { res.push(p.service); seen.add(p.service); }
+      if (res.length === 2) break;
+    }
+    return res;
+  } else {
+    const res = [], seen = new Set([correct.port]);
+    const sorted = session.difficulty === 'hard'
+      ? [...others].sort((a,b) => Math.abs(a.port - correct.port) - Math.abs(b.port - correct.port))
+      : others;
+    for (const p of sorted) {
+      if (!seen.has(p.port)) { res.push(p.port); seen.add(p.port); }
+      if (res.length === 2) break;
+    }
+    return res;
+  }
+}
+
+function buildQuestion(portData) {
+  const pool = POOLS[session.difficulty];
+  const type = Math.random() > 0.5 ? 'port-to-service' : 'service-to-port';
+
+  if (type === 'port-to-service') {
+    // Question: show port number → guess service name
+    // Reveal tag: shows the port number of each option (which the user is looking at anyway — but
+    // for the DECOYS the port number IS the hint, so we still hide until answered)
+    const decoys  = buildDecoys(portData, pool, 'service');
+    const answers = shuffle([portData.service, ...decoys]);
+    return {
+      type,
+      questionText: 'What service runs on port:',
+      mainDisplay:  String(portData.port),
+      // For each answer option (service name), store the port number to reveal after answering
+      answers: answers.map(svc => {
+        const match = pool.find(p => p.service === svc);
+        return {
+          label:      svc,               // text shown on the button
+          revealTag:  `:${match ? match.port : '?'}` // shown after answering
+        };
+      }),
+      correctIdx: answers.indexOf(portData.service),
+      portData
+    };
+  } else {
+    // Question: show service name → guess port number
+    // Reveal tag: shows the service name that belongs to each port option
+    const decoys  = buildDecoys(portData, pool, 'port');
+    const answers = shuffle([portData.port, ...decoys]);
+    return {
+      type,
+      questionText: 'What port does this service use?',
+      mainDisplay:  portData.service,
+      answers: answers.map(port => {
+        const match = pool.find(p => p.port === port);
+        return {
+          label:     String(port),                      // the port number shown on the button
+          revealTag: match ? match.service : '?'        // shown after answering
+        };
+      }),
+      correctIdx: answers.indexOf(portData.port),
+      portData
+    };
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GAME FLOW
+// ═══════════════════════════════════════════════════════════════
+function startGame() {
+  const pool = POOLS[session.difficulty];
+  let q = shuffle(pool).slice(0, Math.min(session.totalQ, pool.length));
+  while (q.length < session.totalQ)
+    q = q.concat(shuffle(pool).slice(0, session.totalQ - q.length));
+
+  session.currentQ = 0; session.score = 0; session.streak = 0;
+  session.maxStreak = 0; session.xpEarned = 0; session.correct = 0;
+  session.wrong = 0; session.wrongPorts = []; session.answered = false;
+  session.currentBuild = null; session.questions = q.slice(0, session.totalQ);
+
+  const badge = document.getElementById('diffBadge');
+  badge.className = 'difficulty-badge ' + session.difficulty;
+  badge.textContent = session.difficulty.toUpperCase();
+
+  showScreen('gameScreen');
+  updateHUD();
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if (session.currentQ >= session.totalQ) { commitSession(); showFinalScreen(); return; }
+  if (session.currentQ > 0 && session.currentQ % 10 === 0) { showCheckpoint(); return; }
+
+  session.answered = false;
+  const portData   = session.questions[session.currentQ];
+  const q          = buildQuestion(portData);
+  session.currentBuild = q;
+
+  // Progress
+  document.getElementById('progressBar').style.width  = (session.currentQ / session.totalQ * 100) + '%';
+  document.getElementById('progressText').textContent =
+    `Question ${session.currentQ + 1} of ${session.totalQ}`;
+
+  // Question card
+  document.getElementById('qCatIcon').textContent    = portData.icon;
+  document.getElementById('qCatName').textContent    = portData.category;
+  document.getElementById('qTypeBadge').textContent  =
+    q.type === 'port-to-service' ? 'PORT → SERVICE' : 'SERVICE → PORT';
+  document.getElementById('questionText').textContent = q.questionText;
+
+  const mainEl = document.getElementById('questionMain');
+  mainEl.className   = q.type === 'port-to-service' ? 'port-number-big' : 'service-name-big';
+  mainEl.textContent = q.mainDisplay;
+
+  // ── Build answer buttons ──────────────────────────────────
+  // Each button has:
+  //   .btn-letter  — A / B / C
+  //   .btn-text    — the main answer label (service name or port number)
+  //   .btn-reveal  — the hidden tag (port number or service name), revealed on answer
+  const grid = document.getElementById('answersGrid');
+  grid.innerHTML = '';
+
+  ['A','B','C'].forEach((letter, idx) => {
+    const ans = q.answers[idx];
+
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.dataset.idx = idx;
+
+    btn.innerHTML =
+      `<span class="btn-letter">${letter}</span>` +
+      `<span class="btn-text">${ans.label}</span>` +
+      `<span class="btn-reveal">${ans.revealTag}</span>`;
+
+    btn.addEventListener('click', () => handleAnswer(idx));
+    grid.appendChild(btn);
+  });
+
+  // Reset explanation + next button
+  document.getElementById('explanationCard').classList.remove('show');
+  document.getElementById('nextBtn').classList.remove('show');
+
+  // Re-trigger card slide animation
+  const card = document.getElementById('questionCard');
+  card.style.animation = 'none';
+  requestAnimationFrame(() => { card.style.animation = 'slideDown 0.4s ease'; });
+}
+
+// ── The key fix: reveal all tags, then apply correct/wrong classes ──
+function handleAnswer(chosenIdx) {
+  if (session.answered) return;
+  session.answered = true;
+
+  const q         = session.currentBuild;
+  const isCorrect = chosenIdx === q.correctIdx;
+  const portData  = q.portData;
+
+  const btns = Array.from(document.querySelectorAll('.answer-btn'));
+
+  // 1. Disable all buttons immediately
+  btns.forEach(b => { b.disabled = true; });
+
+  // 2. Reveal ALL port/service tags simultaneously with a small stagger for polish
+  btns.forEach((b, i) => {
+    // tiny stagger so they pop in left-to-right
+    setTimeout(() => { b.classList.add('revealed'); }, i * 60);
+  });
+
+  // 3. After reveal animation starts, apply correct / wrong / neutral colours
+  setTimeout(() => {
+    btns.forEach((b, i) => {
+      if (i === q.correctIdx) {
+        b.classList.add('correct');
+      } else if (i === chosenIdx) {
+        b.classList.add('wrong');
+      } else {
+        // The third button (neither chosen nor correct) — dim its reveal slightly
+        b.classList.add('neutral-after');
+      }
+    });
+
+    // Particles on the button the user actually clicked
+    spawnParticles(btns[chosenIdx], isCorrect);
+  }, 180); // just after all reveals have started
+
+  // 4. Score / streak / XP
+  if (isCorrect) {
+    session.streak++;
+    session.correct++;
+    session.maxStreak = Math.max(session.maxStreak, session.streak);
+    const bonus = Math.floor(session.streak / 3) * 25;
+    session.score += 100 + bonus;
+    awardXP(15 + (session.streak > 2 ? 5 : 0));
+    if (session.streak > 1) showToast(`🔥 ${session.streak}x STREAK! +${100 + bonus} pts`, '🔥');
+  } else {
+    session.streak = 0;
+    session.wrong++;
+    session.wrongPorts.push(portData);
+    awardXP(2);
+  }
+
+  updateHUD();
+  showExplanation(isCorrect, portData);
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+function showExplanation(ok, p) {
+  const card = document.getElementById('explanationCard');
+  card.classList.add('show');
+  document.getElementById('expResultIcon').textContent  = ok ? '✅' : '❌';
+  const rt = document.getElementById('expResultText');
+  rt.textContent = ok ? 'CORRECT!' : 'WRONG!';
+  rt.className   = 'exp-result-text ' + (ok ? 'correct-text' : 'wrong-text');
+  document.getElementById('expCorrectAnswer').textContent = `Port ${p.port} = ${p.service}`;
+  document.getElementById('expWhat').textContent    = p.what;
+  document.getElementById('expUse').textContent     = p.use;
+  document.getElementById('expDetails').textContent = p.details;
+  document.getElementById('expTip').textContent     = 'Memory Tip: ' + p.tip;
+}
+
+function awardXP(amount) {
+  const oldIdx = getLevelIndex(persist.totalXP);
+  persist.totalXP  += amount;
+  session.xpEarned += amount;
+  const newIdx = getLevelIndex(persist.totalXP);
+  if (newIdx > oldIdx) showLevelUp(LEVELS[newIdx].name);
+  savePersist();
+}
+
+function updateHUD() {
+  const ld = getLevelData(persist.totalXP);
+  const sv = document.getElementById('scoreVal');
+  sv.textContent = session.score.toLocaleString();
+  sv.classList.remove('bump');
+  requestAnimationFrame(() => sv.classList.add('bump'));
+  document.getElementById('streakVal').textContent = session.streak > 0 ? `${session.streak}🔥` : '0';
+  document.getElementById('streakBlock').classList.toggle('hot', session.streak >= 3);
+  document.getElementById('levelName').textContent = ld.curr.name;
+  document.getElementById('xpText').textContent    =
+    ld.idx >= LEVELS.length - 1
+      ? 'MAX LEVEL'
+      : `${persist.totalXP.toLocaleString()} / ${ld.next.xpNeeded.toLocaleString()} XP`;
+  document.getElementById('xpBar').style.width = ld.pct + '%';
+}
+
+function nextQuestion() { session.currentQ++; renderQuestion(); }
+
+// ═══════════════════════════════════════════════════════════════
+//  COMMIT SESSION → PERSIST
+// ═══════════════════════════════════════════════════════════════
+function commitSession() {
+  persist.totalGames   += 1;
+  persist.totalCorrect += session.correct;
+  persist.totalWrong   += session.wrong;
+  if (session.maxStreak > persist.bestStreak) persist.bestStreak = session.maxStreak;
+  const d = session.difficulty;
+  if (session.score > (persist.bestScores[d] || 0)) persist.bestScores[d] = session.score;
+  savePersist();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CHECKPOINT
+// ═══════════════════════════════════════════════════════════════
+function showCheckpoint() {
+  const acc    = session.currentQ > 0 ? Math.round((session.correct / session.currentQ) * 100) : 0;
+  const weak   = [...new Set(session.wrongPorts.map(p => `${p.port}/${p.service}`))];
+  const rStart = session.currentQ - 9;
+
+  document.getElementById('resultsContent').innerHTML = `
+    <span class="results-trophy">${acc >= 80 ? '🏆' : acc >= 60 ? '⚡' : '💪'}</span>
+    <div class="results-title">CHECKPOINT!</div>
+    <div class="results-subtitle">// QUESTIONS ${rStart}–${session.currentQ} COMPLETE //</div>
+    <div class="stats-row">
+      <div class="stat-box cyan">  <span class="stat-value">${session.correct}</span><span class="stat-label">Correct</span></div>
+      <div class="stat-box red">   <span class="stat-value">${session.wrong}</span>  <span class="stat-label">Wrong</span></div>
+      <div class="stat-box green"> <span class="stat-value">${acc}%</span>           <span class="stat-label">Accuracy</span></div>
+      <div class="stat-box purple"><span class="stat-value">${session.maxStreak}🔥</span><span class="stat-label">Best Streak</span></div>
+    </div>
+    ${weak.length > 0 ? `
+    <div class="weak-ports-section">
+      <div class="weak-title">⚠️ STUDY THESE PORTS</div>
+      <div class="weak-list">${weak.map(w => {
+        const [port, svc] = w.split('/');
+        return `<span class="weak-tag"><span>${port}</span> ${svc}</span>`;
+      }).join('')}</div>
+    </div>` : `
+    <div class="weak-ports-section" style="border-color:rgba(0,255,136,0.3)">
+      <div class="weak-title" style="color:var(--neon-green)">✅ PERFECT ROUND!</div>
+      <div style="color:var(--text-dim);font-size:14px;">No mistakes. Keep it up!</div>
+    </div>`}
+    <div class="results-actions">
+      <button class="action-btn primary"   onclick="resumeFromCheckpoint()">CONTINUE QUIZ →</button>
+      <button class="action-btn secondary" onclick="backToMenu()">← MAIN MENU</button>
+    </div>`;
+
+  showScreen('resultsScreen');
+}
+
+function resumeFromCheckpoint() { showScreen('gameScreen'); renderQuestion(); }
+
+// ═══════════════════════════════════════════════════════════════
+//  FINAL SCREEN
+// ═══════════════════════════════════════════════════════════════
+function showFinalScreen() {
+  const acc      = session.totalQ > 0 ? Math.round((session.correct / session.totalQ) * 100) : 0;
+  const grade    = acc >= 90 ? 'S' : acc >= 80 ? 'A' : acc >= 70 ? 'B' : acc >= 60 ? 'C' : acc >= 50 ? 'D' : 'F';
+  const gColor   = { S:'#FFD700', A:'#00ff88', B:'#00d4ff', C:'#ffff00', D:'#ff6600', F:'#ff3366' }[grade];
+  const msg      = { S:'LEGENDARY NETWORK WIZARD! 🧙', A:'EXCELLENT WORK, SYSADMIN! 🎯',
+                     B:'SOLID KNOWLEDGE! KEEP GOING! 💪', C:'GETTING THERE! PRACTICE MORE! 📚',
+                     D:'KEEP STUDYING THOSE PORTS! 🔧', F:'BACK TO BASICS! YOU GOT THIS! 📖' }[grade];
+  const isNewBest = session.score > 0 && session.score >= persist.bestScores[session.difficulty];
+  const ld        = getLevelData(persist.totalXP);
+  const weak      = [...new Set(session.wrongPorts)];
+
+  document.getElementById('finalContent').innerHTML = `
+    <span class="final-grade" style="color:${gColor};text-shadow:0 0 30px ${gColor}66">GRADE: ${grade}</span>
+    ${isNewBest ? `<div class="new-best-badge">🏆 NEW BEST — ${session.score.toLocaleString()} pts</div>` : ''}
+    <div class="final-message">${msg}</div>
+    <div style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:12px;margin-bottom:28px">
+      // ${session.difficulty.toUpperCase()} MODE — ${session.totalQ} QUESTIONS //
+    </div>
+    <div class="stats-row">
+      <div class="stat-box cyan">  <span class="stat-value">${session.score.toLocaleString()}</span><span class="stat-label">Score</span></div>
+      <div class="stat-box green"> <span class="stat-value">${session.correct}/${session.totalQ}</span><span class="stat-label">Correct</span></div>
+      <div class="stat-box" style="border-color:var(--border)"><span class="stat-value" style="color:${gColor}">${acc}%</span><span class="stat-label">Accuracy</span></div>
+      <div class="stat-box purple"><span class="stat-value">${session.maxStreak}🔥</span><span class="stat-label">Best Streak</span></div>
+      <div class="stat-box" style="border-color:var(--border)"><span class="stat-value" style="color:var(--neon-cyan)">+${session.xpEarned}</span><span class="stat-label">XP Earned</span></div>
+    </div>
+    ${weak.length > 0 ? `
+    <div class="weak-ports-section">
+      <div class="weak-title">📚 PORTS TO REVIEW</div>
+      <div class="weak-list">${weak.slice(0,12).map(p =>
+        `<span class="weak-tag" title="${p.what}"><span>${p.port}</span> ${p.service}</span>`).join('')}
+      </div>
+    </div>` : `
+    <div class="weak-ports-section" style="border-color:rgba(0,255,136,0.4);background:rgba(0,255,136,0.05)">
+      <div class="weak-title" style="color:var(--neon-green)">🎉 FLAWLESS VICTORY!</div>
+      <div style="color:var(--text-dim);font-size:14px;">Every question correct. True Network Wizard!</div>
+    </div>`}
+    <div class="career-panel">
+      <div class="career-panel-title">// CAREER STATS //</div>
+      <div class="career-grid">
+        <div class="career-stat"><span class="career-stat-label">Total XP</span>         <span class="career-stat-value" style="color:var(--neon-purple)">${persist.totalXP.toLocaleString()}</span></div>
+        <div class="career-stat"><span class="career-stat-label">Level</span>             <span class="career-stat-value" style="color:var(--neon-purple)">${ld.curr.avatar} ${ld.curr.name}</span></div>
+        <div class="career-stat"><span class="career-stat-label">Games Played</span>      <span class="career-stat-value" style="color:var(--neon-cyan)">${persist.totalGames.toLocaleString()}</span></div>
+        <div class="career-stat"><span class="career-stat-label">All-Time Correct</span>  <span class="career-stat-value" style="color:var(--neon-green)">${persist.totalCorrect.toLocaleString()}</span></div>
+        <div class="career-stat"><span class="career-stat-label">All-Time Wrong</span>    <span class="career-stat-value" style="color:var(--wrong)">${persist.totalWrong.toLocaleString()}</span></div>
+        <div class="career-stat"><span class="career-stat-label">Best Streak Ever</span>  <span class="career-stat-value" style="color:var(--neon-orange)">${persist.bestStreak}🔥</span></div>
+        <div class="career-stat"><span class="career-stat-label">Best — Easy</span>       <span class="career-stat-value" style="color:#ffd700">${(persist.bestScores.easy   || 0).toLocaleString()}</span></div>
+        <div class="career-stat"><span class="career-stat-label">Best — Medium</span>     <span class="career-stat-value" style="color:#ffd700">${(persist.bestScores.medium || 0).toLocaleString()}</span></div>
+        <div class="career-stat"><span class="career-stat-label">Best — Hard</span>       <span class="career-stat-value" style="color:#ffd700">${(persist.bestScores.hard   || 0).toLocaleString()}</span></div>
+      </div>
+    </div>
+    <div class="results-actions">
+      <button class="action-btn primary" onclick="startGame()">🔄 PLAY AGAIN</button>
+      <button class="action-btn primary" style="border-color:var(--neon-green);color:var(--neon-green)" onclick="startHarder()">⬆️ HARDER MODE</button>
+      <button class="action-btn secondary" onclick="backToMenu()">← MAIN MENU</button>
+    </div>`;
+
+  showScreen('finalScreen');
+}
+
+function startHarder() {
+  const order = ['easy','medium','hard'];
+  session.difficulty = order[Math.min(order.indexOf(session.difficulty) + 1, 2)];
+  document.querySelectorAll('.diff-card').forEach(c =>
+    c.classList.toggle('selected', c.classList.contains(session.difficulty)));
+  startGame();
+}
+
+function backToMenu() { refreshBanner(); showScreen('startScreen'); }
+
+// ═══════════════════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════════════════
+(function boot() { refreshBanner(); })();
+</script>
+</body>
+</html>
+
+							<script>
+                            	// Port→Service mode: label = service name, revealTag = :port_number
+{ label: "HTTP",  revealTag: ":80"  }
+{ label: "SMTP",  revealTag: ":25"  }
+
+// Service→Port mode: label = port number, revealTag = service name
+{ label: "80",   revealTag: "HTTP"  }
+{ label: "25",   revealTag: "SMTP"  }
+
+// Step 1 — reveal all tags with a 60ms stagger
+btns.forEach((b, i) => setTimeout(() => b.classList.add('revealed'), i * 60));
+
+// Step 2 — after reveal animations start, apply correct/wrong colours
+setTimeout(() => {
+  btns[q.correctIdx].classList.add('correct');   // green
+  if (chosenIdx !== q.correctIdx) btns[chosenIdx].classList.add('wrong'); // red
+  // third button gets a dim style so it doesn't distract
+  btns[thirdIdx].classList.add('neutral-after');
+}, 180);
+							</script>
+                        </body>
+                        </html>
+                    
